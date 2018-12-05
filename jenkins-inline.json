@@ -1,0 +1,35 @@
+{
+    "variables": {
+      "aws_access_key": "",
+      "aws_secret_key": ""
+    },
+    "builders": [{
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "eu-central-1",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "*amzn2-ami-hvm-2*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["amazon"],
+        "most_recent": true
+      },
+      "ssh_username": "ec2-user",
+      "instance_type": "t2.micro",
+      "ami_name": "packer-jenkins {{timestamp}}"
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+          "sudo yum update –y",
+          "sudo yum install -y tmux",
+          "sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat/jenkins.repo",
+          "sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key",
+          "sudo yum install -y java jenkins",
+          "sudo service jenkins enable"
+        ]
+      }]
+}
