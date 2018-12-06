@@ -3,5 +3,21 @@
 - hosts: all
   become: yes
   tasks:
+    - name: install repo
+      command: wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat/jenkins.repo
+
+    - name: install repo key
+      command: rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+
     - name: install jenkins
-      command: amazon-linux-extras install jenkins
+      yum:
+        name:
+          - java
+          - jenkins
+
+    - name: start jenkins
+      systemd:
+        name: jenkins
+        state: started
+        daemon_reload: yes
+        enabled: yes
